@@ -15,7 +15,7 @@ export default createMuiTheme({
       main: secondary,
     },
   },
-  overrides: {
+ /* overrides: {
     MuiDialogActions: {
       root: {
         padding: "8px 24px 16px 24px",
@@ -45,5 +45,5 @@ export default createMuiTheme({
         padding: "0px 0 0 10px",
       },
     },
-  },
+  },*/
 });

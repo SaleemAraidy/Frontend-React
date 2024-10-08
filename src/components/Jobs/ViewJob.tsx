@@ -13,9 +13,9 @@ const skillsChip ={
     color:"#fff"
 };
 
-export default function ViewJob(props){
+export default function ViewJob(props: any){
     return(
-        <Dialog open={Object.keys(props.job).length} fullWidth>
+        <Dialog open={Object.keys(props.job).length>0} fullWidth>
             <DialogTitle>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                         {props.job.jobTitle} - {props.job.jobPlace}
@@ -65,7 +65,7 @@ export default function ViewJob(props){
                     <Typography variant="caption" fontSize={13}>Basic requirements:</Typography>
                    {<Grid container alignItems="center">
                         {props.job.skills && 
-                         props.job.skills.map((skill)=>(
+                         props.job.skills.map((skill: any)=>(
                             <Grid item key={skill} sx={skillsChip}>
                                 {skill}
                             </Grid>

@@ -13,7 +13,7 @@ const skillsChip ={
     color:"#fff"
 };
 
-export default function JobCard(props){
+export default function JobCard(props: any){
     return (
         <Box sx={{ 
             padding: 2, 
@@ -24,7 +24,6 @@ export default function JobCard(props){
             border: "1px solid #e8e8e8",
             marginLeft:30,
             marginTop:2,
-            border:"1px solid #e8e8e8",
             transition:"0.2s",
             "&:hover":{
                 boxShadow: "0px 5px 25px rgba(0,0,0,0.1)",
@@ -51,7 +50,7 @@ export default function JobCard(props){
                 </Grid>
 
                 <Grid item container xs={4} spacing={1}>
-                   { props.skills.map((skill) => (
+                   { props.skills.map((skill: any) => (
                         <Grid key={skill} sx={skillsChip} item> {skill} </Grid>
                     ))}
                 </Grid>
@@ -64,7 +63,7 @@ export default function JobCard(props){
                     </Grid>
                     <Grid item>
                         <Box mt={1}>
-                            <Button onClick={props.open} variant="outlined" color="black" sx={{borderRadius:'25px' ,fontWeight:'bold'}}>Check</Button>
+                            <Button onClick={props.open} variant="outlined"  sx={{color:"black" ,borderRadius:'25px' ,fontWeight:'bold'}}>Check</Button>
                         </Box>
 
                     </Grid>

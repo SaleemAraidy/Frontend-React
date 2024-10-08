@@ -39,7 +39,18 @@ const skillStyling ={
     }
 };
 
-const initState = {
+interface JobDetails {
+    jobTitle: string;
+    type: string; // For example, it could be "Full time", "Part time", etc.
+    placeType: string; // For example, it could be "hi-tech", "startup", etc.
+    jobPlace: string; // Name of the company or job location
+    contactNumber: string; // Contact number as a string
+    skills: string[]; // Array of skills required for the job
+    link: string; // URL or link related to the job posting
+    description: string; // Job description
+}
+
+const initState : JobDetails  = {
     jobTitle: "",
     type: "Placeholder",
     placeType: "Placeholder",
@@ -51,12 +62,12 @@ const initState = {
 }
 
 
-export default function NewJob(props){
+export default function NewJob(props: any){
     const [loading,setLoading]=useState(false);
-    const [jobDetails,setJobDetails] = useState(initState);
-    const [errorFields, setErrorFields] = useState({});
+    const [jobDetails,setJobDetails] = useState<JobDetails>(initState);
+    const [errorFields, setErrorFields] = useState<any>({});
 
-    const handleChange = (e) => {
+    const handleChange = (e: any) => {
         //e.persist();
         setJobDetails(oldState => ({...oldState,[e.target.name]:e.target.value}));
     }
@@ -66,7 +77,7 @@ export default function NewJob(props){
 
         const { jobTitle, type, jobPlace, contactNumber, placeType } = jobDetails;
         
-        const errors = {};
+        const errors: any = {};
         if (!jobTitle) errors.jobTitle = true;
         if (!jobPlace) errors.jobPlace = true;
         if (!contactNumber) errors.contactNumber = true;
@@ -86,13 +97,15 @@ export default function NewJob(props){
 
 
 
-    const addRemoveSkill = (skill) =>
-        jobDetails.skills.includes(skill)
+    const addRemoveSkill = (skill: any) => {
+        const skillStr: string = skill ?? "";
+        return jobDetails.skills.includes(skillStr)
             ? setJobDetails((oldState)=>({
                 ...oldState,
                 skills: oldState.skills.filter((s)=>s!==skill),
             }))
             : setJobDetails(oldState=>({...oldState,skills:oldState.skills.concat(skill)}))
+        }
 
 
 
@@ -150,7 +163,7 @@ export default function NewJob(props){
                              </Select>
                         </Grid>
                         <Grid item xs={6}>
-                            <FilledInput onChange={handleChange} autoComplete='off' name="link" value={jobDetails.links}
+                            <FilledInput onChange={handleChange} autoComplete='off' name="link" value={jobDetails.link}
                             sx={{ height: '56px' }} placeholder='Job URL' disableUnderline fullWidth />
                         </Grid>
                         <Grid item xs={12}>

@@ -3,14 +3,14 @@ import {Box , Select ,MenuItem , Button} from '@mui/material';
 
 
 
-export default function SearchBar(props) {
+export default function SearchBar(props: any) {
   const [loading,setLoading] = useState(false);
   const [jobSearch,setJobSearch] = useState({
     type: "Placeholder",
     placeType:"Placeholder"
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     //e.persist();
     setJobSearch(oldState => ({...oldState,[e.target.name]:e.target.value}));
     //console.log(jobSearch);

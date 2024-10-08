@@ -6,7 +6,7 @@ import {Box , Grid ,Typography , Button } from '@mui/material';
     <Button>Post a job</Button>
 </Box>*/
 
-function Header(props){
+function Header(props: any){
    return <Box py={10} bgcolor="#0A66C2" color="white">
             <Grid container justifyContent="center">
                 <Grid item xs={10} sx={{ px: 2 }}>
