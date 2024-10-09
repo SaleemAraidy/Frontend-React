@@ -1,18 +1,14 @@
 import React ,{useState,useEffect} from "react";
 import {Typography,ThemeProvider, CircularProgress,Box, Grid2,Grid} from "@mui/material";
-//import theme from "./theme/theme";
-
-
-import { query, collection, orderBy, getDocs ,addDoc ,serverTimestamp , where } from 'firebase/firestore';
-import { useAxiosGet } from "./hooks/useAxiosGet";
-import {JobObject} from "./model/job.model"
+import axios from "axios";
+import {JobObject} from "./model/job.model";
 import theme from "./theme/theme";
 import ViewJob from "./components/Jobs/ViewJob";
 import JobCard from "./components/Jobs/JobCard";
 import SearchBar from "./components/SearchBar";
 import NewJob from "./components/Jobs/NewJob";
 import Header from "./components/Header";
-import { firestore } from "./firebase/config";
+
 
 
 export default function App(){
@@ -21,26 +17,21 @@ export default function App(){
   const [newJobDialog,setNewJobDialog] = useState(false);
   const [viewJob,setViewJob] = useState({});
   const jobListURL = "http://localhost:8000/api/jobs";
-  const { data: jobList, loading: jobListLoading } = useAxiosGet<JobObject>(jobListURL);
-
-  console.log("Job List: :",jobList);
-  console.log("Job List Loading:",jobListLoading);
 
   const fetchJobs = async () => {
     setLoading(true);
-    const q = query(collection(firestore, "jobs"), orderBy("posted", "desc"));
-    const querySnapshot = await getDocs(q);
-    const jobsData = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      posted: doc.data().posted.toDate()
-    }));
-    setJobs(jobsData);
-    setLoading(false);
+    try {
+      const response = await axios.get(jobListURL); // Fetch jobs using Axios
+      setJobs(response.data); // Set jobs state with fetched data
+    } catch (error) {
+      console.error("Error fetching jobs: ", error);
+    } finally {
+      setLoading(false); // Stop loading regardless of success or failure
+    }
   }
 
  
-  const fetchJobsCustom = async (jobSearch: any) => {
+  /*const fetchJobsCustom = async (jobSearch: any) => {
     setLoading(true);
   
     let q = query(collection(firestore, "jobs"), orderBy("posted", "desc"));
@@ -59,22 +50,36 @@ export default function App(){
       ...doc.data(),
       posted: doc.data().posted.toDate()
     }));
-  
     setJobs(jobsData);
     setLoading(false);
+  };*/
+
+  const fetchJobsCustom = async (jobSearch: any) => {
+    setLoading(true);
+    try{
+      const response = await axios.get(`${jobListURL}/filter`,{params: jobSearch});
+      setJobs(response.data);
+    }catch(error){
+      console.error("Error fetching jobs in custom search: ", error);
+    }finally{
+      setLoading(false)
+    }
   };
 
 
 
-  const postJob = async (jobDetails: any) => {
+
+
+
+  const postJob = async (jobDetails: JobObject) => {
+    setLoading(true);
     try {
-      await addDoc(collection(firestore, "jobs"), {
-        ...jobDetails,
-        posted: serverTimestamp() 
-      });
-      fetchJobs(); 
+      const response = await axios.post(jobListURL,jobDetails); // Fetch jobs using Axios
+      fetchJobs(); // Set jobs state with fetched data
     } catch (error) {
-      console.error("Error adding job: ", error);
+      console.error("Error fetching jobs: ", error);
+    } finally {
+      setLoading(false); // Stop loading regardless of success or failure
     }
   };
 
@@ -100,7 +105,7 @@ export default function App(){
                   </Typography>
                 </Box>
               ) :( jobs.map((job:any)=>{
-                  return <JobCard open={()=>setViewJob(job)} key={job.id} {...job}/>
+                  return <JobCard open={()=>{console.log("reached open"); setViewJob(job); console.log("reached open 23");}} key={job.id} {...job}/>
                 }))
       }
       </Grid>

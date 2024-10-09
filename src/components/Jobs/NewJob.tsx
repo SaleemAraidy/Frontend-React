@@ -1,6 +1,8 @@
 import React,{useState} from 'react';
 import {Box,Grid,Select,MenuItem,Dialog,DialogTitle,DialogContent,DialogActions,FilledInput, Typography, Button,IconButton, CircularProgress} from '@mui/material';
 import {Close as CloseIcon} from '@mui/icons-material';
+import {JobObject} from "../../model/job.model";
+import { serverTimestamp, Timestamp } from 'firebase/firestore';
 
 
 const selectStylig = {
@@ -39,7 +41,7 @@ const skillStyling ={
     }
 };
 
-interface JobDetails {
+/*interface JobDetails {
     jobTitle: string;
     type: string; // For example, it could be "Full time", "Part time", etc.
     placeType: string; // For example, it could be "hi-tech", "startup", etc.
@@ -48,9 +50,10 @@ interface JobDetails {
     skills: string[]; // Array of skills required for the job
     link: string; // URL or link related to the job posting
     description: string; // Job description
-}
+}*/
 
-const initState : JobDetails  = {
+const initState : JobObject  = {
+    //id:"",
     jobTitle: "",
     type: "Placeholder",
     placeType: "Placeholder",
@@ -58,18 +61,19 @@ const initState : JobDetails  = {
     contactNumber: "",
     skills: [],
     link: "",
-    description: ""
+    description: "",
+    posted: serverTimestamp,
 }
 
 
 export default function NewJob(props: any){
     const [loading,setLoading]=useState(false);
-    const [jobDetails,setJobDetails] = useState<JobDetails>(initState);
+    const [jobDetails,setJobDetails] = useState<JobObject>(initState);
     const [errorFields, setErrorFields] = useState<any>({});
 
     const handleChange = (e: any) => {
         //e.persist();
-        setJobDetails(oldState => ({...oldState,[e.target.name]:e.target.value}));
+        setJobDetails((oldState : JobObject) => ({...oldState,[e.target.name]:e.target.value}));
     }
 
 
@@ -81,8 +85,8 @@ export default function NewJob(props: any){
         if (!jobTitle) errors.jobTitle = true;
         if (!jobPlace) errors.jobPlace = true;
         if (!contactNumber) errors.contactNumber = true;
-        if (type === 'All') errors.type = true;
-        if (placeType === 'All') errors.placeType = true;
+        //if (type === 'All') errors.type = true;
+        //if (placeType === 'All') errors.placeType = true;
 
         if (Object.keys(errors).length > 0) {
             setErrorFields(errors);

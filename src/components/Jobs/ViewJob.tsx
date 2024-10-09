@@ -2,6 +2,7 @@ import React from 'react';
 import {Box,Grid,Select,MenuItem,Dialog,DialogTitle,DialogContent,DialogActions,FilledInput, Typography, Button,IconButton, CircularProgress} from '@mui/material';
 import {Close as CloseIcon} from '@mui/icons-material';
 import {format} from 'date-fns';
+import { convertTimestampToDate } from './JobCard';
 
 const skillsChip ={
     margin:"4px",
@@ -30,7 +31,8 @@ export default function ViewJob(props: any){
                 <Box display="flex" ml={3} mb={2}>
                     <Typography variant="caption" fontSize={13}>Posted on:{" "}</Typography>
                     <Typography variant="body2" display="inline" ml={1} mt={0.1}>
-                      {props.job.posted && format(props.job.posted,"dd/MM/yyyy HH:MM")}
+                        {console.log(typeof props.job.posted)}
+                      {props.job.posted && format(convertTimestampToDate(props.job.posted),"dd/MM/yyyy HH:MM")}
                     </Typography>
                 </Box>
 

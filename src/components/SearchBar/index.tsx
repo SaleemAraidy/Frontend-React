@@ -20,7 +20,6 @@ export default function SearchBar(props: any) {
     setLoading(true);
     await props.fetchJobsCustom(jobSearch);
     setLoading(false);
-
   }
 
 

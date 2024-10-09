@@ -13,7 +13,18 @@ const skillsChip ={
     color:"#fff"
 };
 
+function convertTimestampToDate(posted: any) {
+    if(!posted){
+        console.log("One of them undefined");
+    }
+    const milliseconds = posted._seconds * 1000 + Math.floor(posted._nanoseconds / 1000000);
+    return new Date(milliseconds);
+}
+
+export {convertTimestampToDate};
 export default function JobCard(props: any){
+    
+
     return (
         <Box sx={{ 
             padding: 2, 
@@ -58,7 +69,8 @@ export default function JobCard(props: any){
                 <Grid item container direction="column" alignItems="flex-end" xs ={4}>
                     <Grid item>
                         <Typography variant="caption">
-                          {differenceInCalendarDays(Date.now(),props.posted)} days ago | {props.type} | {props.placeType}
+                          {differenceInCalendarDays(Date.now(),convertTimestampToDate(props.posted))} days ago
+                          | {props.type} | {props.placeType}
                         </Typography>
                     </Grid>
                     <Grid item>

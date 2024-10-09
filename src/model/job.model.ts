@@ -1,10 +1,12 @@
+import { serverTimestamp,Timestamp } from 'firebase/firestore';
+
 export interface PostedTimestamp {
     _seconds: number; 
     _nanoseconds: number; 
   }
   
   export interface JobObject {
-    id: string; 
+    //id: string; 
     skills: string[]; 
     placeType: string; 
     jobTitle: string; 
@@ -12,6 +14,7 @@ export interface PostedTimestamp {
     link: string; 
     type: string; 
     jobPlace: string; 
-    posted: PostedTimestamp; 
+    posted: typeof serverTimestamp;
+    description: string;
   }
 
