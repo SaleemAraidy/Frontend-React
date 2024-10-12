@@ -5,6 +5,7 @@ import {JobObject} from "../../model/job.model";
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 
 
+
 const selectStylig = {
     minWidth: 150,
     height: '56px', 
@@ -75,6 +76,7 @@ export default function NewJob(props: any){
         //e.persist();
         setJobDetails((oldState : JobObject) => ({...oldState,[e.target.name]:e.target.value}));
     }
+
 
 
    const handleSubmit = async () => {
