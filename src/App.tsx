@@ -9,34 +9,42 @@ import SearchBar from "./components/SearchBar";
 import NewJob from "./components/Jobs/NewJob";
 import Header from "./components/Header";
 import {RegisterCredentials,LoginCredentials} from "./model/credentials.model";
+import { useAxiosGet } from "./hooks/UseAxiosGet";
+import { signal } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
+
+
+export interface Filters{
+  type?: string | undefined;
+  placeType?: string | undefined;
+}
+
+export const filters = signal<Filters|null>(null);
 
 
 
 export default function App(){
-  const [jobs,setJobs] = useState<any>([]);
+  useSignals();
+  console.log("the value is:",filters.value);
+  const [filteredJobs,setfilteredJobs] = useState<JobObject []>([]);
+  const [toggleFetch,setToggleFtech] = useState<boolean>(false);
   const [loading,setLoading] = useState(true);
   const [newJobDialog,setNewJobDialog] = useState(false);
   const [viewJob,setViewJob] = useState({});
   const serverURL = "http://localhost:8000/api";
+  const {data: jobs ,loading: jobsLoading , error} = useAxiosGet<JobObject []>(`${serverURL}/jobs`,toggleFetch);
+  console.log("App component");
+  useEffect(()=>{
+    if(jobsLoading===false)
+      setLoading(false);
+  },[jobsLoading]);
 
-  const fetchJobs = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${serverURL}/jobs`); // Fetch jobs using Axios
-      setJobs(response.data); // Set jobs state with fetched data
-    } catch (error) {
-      console.error("Error fetching jobs: ", error);
-    } finally {
-      setLoading(false); // Stop loading regardless of success or failure
-    }
-  }
-
-
+ 
   const fetchJobsCustom = async (jobSearch: any) => {
     setLoading(true);
     try{
       const response = await axios.get(`${serverURL}/jobs/filter`,{params: jobSearch});
-      setJobs(response.data);
+      //setJobs(response.data);
     }catch(error){
       console.error("Error fetching jobs in custom search: ", error);
     }finally{
@@ -44,22 +52,6 @@ export default function App(){
     }
   };
 
-
-
-
-
-
-  const postJob = async (jobDetails: JobObject) => {
-    setLoading(true);
-    try {
-      const response = await axios.post(`${serverURL}/jobs`,jobDetails); // Fetch jobs using Axios
-      fetchJobs(); // Set jobs state with fetched data
-    } catch (error) {
-      console.error("Error fetching jobs: ", error);
-    } finally {
-      setLoading(false); // Stop loading regardless of success or failure
-    }
-  };
 
 
   const registeUser = async (userCredentials: RegisterCredentials) => {
@@ -73,12 +65,33 @@ export default function App(){
       }
   }
 
-
-
-  useEffect(()=>{
-    fetchJobs();
-  },[]);
-  
+   useEffect(()=>{
+    let newFiltered: null | undefined | JobObject[] = jobs;
+    console.log("first values are:",newFiltered);  
+    if(filters.value){
+      console.log("Filtering...");
+      if(filters.value.type && filters.value.type!=='All' && filters.value.type!=='Placehodler'){
+        console.log("Filtering FILTER 1...");
+         newFiltered = newFiltered?.filter((item)=>{
+          return item.type === filters.value?.type;
+        })
+      }
+      if(filters.value.placeType && filters.value.placeType!=='All' && filters.value.placeType!=='Placehodler'){
+        console.log("Filtering FILTER 2...");
+        newFiltered = newFiltered?.filter((item)=>{
+          return item.placeType === filters.value?.placeType;
+        })
+      }
+      if(newFiltered){
+      setfilteredJobs(newFiltered);
+      }
+    } else {
+      if(jobs) setfilteredJobs(jobs);
+    }
+    console.log("Filtered jobs are :" , newFiltered);
+  },[filters.value,jobs]);  
+ 
+   
   return <ThemeProvider theme={theme}>
    <Header openNewJobDialog={()=>setNewJobDialog(true)} />
     <Box mb={5}>
@@ -88,7 +101,7 @@ export default function App(){
 
         <NewJob newJobDialog={newJobDialog} 
                 closeNewJobDialog={()=>setNewJobDialog(false)} 
-                postJob={postJob} />
+                toggleFetch={toggleFetch} setToggleFtech={setToggleFtech} />
 
         <ViewJob job={viewJob} closeViewJob={()=>setViewJob({})} />
 
@@ -99,7 +112,7 @@ export default function App(){
                            color="#0A66C2"><CircularProgress 
                            sx={{color:"#0A66C2"}}/> 
                            </Box>) :
-               jobs.length==0 ?  (
+               filteredJobs?.length==0 ?  (
                 <Box ml={25} 
                      mt={5}
                      display='flex' 
@@ -110,7 +123,7 @@ export default function App(){
                   </Typography>
 
                 </Box>
-              ) :( jobs.map((job:any)=>{
+              ) :( filteredJobs?.map((job:any)=>{
                   return <JobCard open={()=>{console.log("reached open"); 
                                   setViewJob(job); console.log("reached open 23");}} 
                                   key={job.id} {...job}/>

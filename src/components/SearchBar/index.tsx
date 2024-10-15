@@ -1,29 +1,40 @@
-import React , {useState} from 'react';
+import React , {useEffect, useState} from 'react';
 import {Box , Select ,MenuItem , Button} from '@mui/material';
+import { filters } from '../../App';
+import { useSignals } from '@preact/signals-react/runtime';
+
 
 
 
 export default function SearchBar(props: any) {
+  useSignals();
   const [loading,setLoading] = useState(false);
-  const [jobSearch,setJobSearch] = useState({
-    type: "Placeholder",
-    placeType:"Placeholder"
-  });
+  //const [jobSearch,setJobSearch] = useState(filters.value);
+  //const [filterType,setFilterType] = useState(filters.value.type);
+  //const [filterPlace,setFilterPlace] = useState(filters.value.placeType);
+
+  /* useEffect(()=>{
+    if(filters.value){
+      setFilterType(filters.value.type);
+      setFilterPlace(filters.value.placeType);
+    }
+  },[filters.value]) */
 
   const handleChange = (e: any) => {
     //e.persist();
-    setJobSearch(oldState => ({...oldState,[e.target.name]:e.target.value}));
+    //setJobSearch(oldState => ({...oldState,[e.target.name]:e.target.value}));
+    filters.value = {...filters.value,[e.target.name]:e.target.value};
+    console.log("After change:",filters.value);
     //console.log(jobSearch);
   }
 
   const search = async () =>{
     setLoading(true);
-    await props.fetchJobsCustom(jobSearch);
+    await props.fetchJobsCustom(filters.value);
     setLoading(false);
   }
 
-
-console.log(jobSearch);
+  console.log("hoda3a kablo:",filters.value);
 
   return (
     <Box p={2} mt={-5}
@@ -49,14 +60,14 @@ console.log(jobSearch);
       noValidate
       autoComplete="off"
     >
-        <Select disableUnderline onChange={handleChange}  variant="filled" value={jobSearch.type} name="type"  sx={{ minWidth: 150, height: 40 , paddingBottom:2 }}>
+        <Select disableUnderline onChange={handleChange}  variant="filled" value={filters.value?.type?? "Placeholder"} name="type"  sx={{ minWidth: 150, height: 40 , paddingBottom:2 }}>
             <MenuItem value="Placeholder" disabled>Select Job Type</MenuItem>
             <MenuItem value ="All">All</MenuItem>
             <MenuItem value ="Full time">Full time</MenuItem>
             <MenuItem value="Part time">Part time</MenuItem>
             <MenuItem value="Remote">Remote</MenuItem>
         </Select>
-        <Select disableUnderline onChange={handleChange}  variant="filled" value={jobSearch.placeType} name="placeType" sx={{ minWidth: 150, height: 40 ,paddingBottom:2}}>
+        <Select disableUnderline onChange={handleChange}  variant="filled" value={filters.value?.placeType?? "Placeholder"} name="placeType" sx={{ minWidth: 150, height: 40 ,paddingBottom:2}}>
             <MenuItem value="Placeholder" disabled>Select Work Place</MenuItem>
             <MenuItem value ="All">All</MenuItem>
             <MenuItem value ="Food Place">Food Place</MenuItem>

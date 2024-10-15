@@ -1,8 +1,9 @@
-import React,{useState} from 'react';
+import React,{useCallback, useState} from 'react';
 import {Box,Grid,Select,MenuItem,Dialog,DialogTitle,DialogContent,DialogActions,FilledInput, Typography, Button,IconButton, CircularProgress} from '@mui/material';
 import {Close as CloseIcon} from '@mui/icons-material';
 import {JobObject} from "../../model/job.model";
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
+import axios from 'axios';
 
 
 
@@ -71,6 +72,21 @@ export default function NewJob(props: any){
     const [loading,setLoading]=useState(false);
     const [jobDetails,setJobDetails] = useState<JobObject>(initState);
     const [errorFields, setErrorFields] = useState<any>({});
+    const serverURL = "http://localhost:8000/api";
+
+
+    const postJob = useCallback(async (jobDetails: JobObject) => {
+        setLoading(true);
+        try {
+          await axios.post(`${serverURL}/jobs`,jobDetails); 
+          props.setToggleFtech(!props.toggleFetch);
+        } catch (error) {
+          console.error("Error fetching jobs: ", error);
+        } finally {
+          setLoading(false); 
+        }
+    },[serverURL]); 
+
 
     const handleChange = (e: any) => {
         //e.persist();
@@ -97,7 +113,7 @@ export default function NewJob(props: any){
 
             setErrorFields({});
             setLoading(true);
-            await props.postJob(jobDetails);
+            await postJob(jobDetails);
             closeDialog();
     }
 

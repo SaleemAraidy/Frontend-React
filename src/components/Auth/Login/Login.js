@@ -12,7 +12,10 @@ import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import {Box , Grid } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../../../firebase/config';
+import {useState} from 'react';
+import axios from 'axios';
 
 function Header(props){
   return <Box py={5} bgcolor="#0A66C2" color="white">
@@ -26,7 +29,71 @@ function Header(props){
        </Box>
 }
 
+function validateEmail(email){
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+
+
+const initState = {
+  email: "",
+  Password: ""
+}
+
 export default function Login() {
+  const [loginCreds , setLoginCreds] = useState(initState); 
+  const [errorFields, setErrorFields] = useState({});
+  const [loading,setLoading]=useState(false);
+
+
+  const loginUser = async (userCredentials) => {
+    console.log("Entered loginUser");
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, loginCreds.email, loginCreds.password);
+      const user = userCredential.user;
+  
+      // Get the user's ID token
+      const token = await user.getIdToken();
+  
+      // Send this token to your backend for verification
+      const response = await axios.post('http://localhost:8000/api/login', { token });
+  
+      console.log('User signed in:', response.data);
+    } catch (error) {
+      console.error('Error logging in:', error);
+      //setError('Invalid email or password');
+    }
+  }
+  
+  
+  const handleChange = (e) => {
+    console.log("Entered handleChange");
+    setLoginCreds((oldState) => ({...oldState,[e.target.name]:e.target.value}));
+  }
+  
+  
+  
+  const handleSubmit = async () => {
+    console.log("Entered handleSubmit");
+    const { email, password} = loginCreds;
+    
+    const errors = {};
+    if (!validateEmail(email)) {errors.email = true; console.log("Email no good");}
+  
+    if (Object.keys(errors).length > 0) {
+        setErrorFields(errors);
+        return;
+    }
+  
+        setErrorFields({});
+        setLoading(true);
+        await loginUser(loginCreds);
+        setLoading(false);
+  }
+
+
   return (
   <CssVarsProvider>
     <main>
@@ -59,9 +126,19 @@ export default function Login() {
           <FormLabel>Email</FormLabel>
           <Input
             // html input attribute
+            onChange={handleChange} 
+            autoComplete='off'  
+            value={loginCreds.email}
             name="email"
             type="email"
+            sx={{border: errorFields.email ? '1px solid red' : 'grey.800',
+            }}
           />
+          {errorFields.email && (
+            <Typography sx={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+               Please enter a valid email
+            </Typography>
+          )}
         </FormControl>
 
 
@@ -69,12 +146,24 @@ export default function Login() {
           <FormLabel>Password</FormLabel>
           <Input
             // html input attribute
+            onChange={handleChange} 
+            autoComplete='off'  
+            value={loginCreds.password}
             name="password"
             type="password"
           />
         </FormControl>
         
-        <Button sx={{ mt: 1 /* margin top */ }}>Log in</Button>
+        <Button sx={{ mt: 1 ,
+                 backgroundColor: loading ? 'grey' : 'primary.main',
+                 color: 'white',
+                 cursor: loading ? 'not-allowed' : 'pointer',
+                 '&:hover': {
+                 backgroundColor: loading ? 'grey' : 'primary.dark',
+                   },}}
+                onClick={handleSubmit}
+                disabled={loading}
+                >Log in</Button>
         <Typography
           endDecorator={<Link href="/sign-up">Sign up</Link>}
           sx={{ fontSize: 'sm', alignSelf: 'center' }}

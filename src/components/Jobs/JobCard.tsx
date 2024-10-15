@@ -75,7 +75,7 @@ export default function JobCard(props: any){
                     </Grid>
                     <Grid item>
                         <Box mt={1}>
-                            <Button onClick={props.open} variant="outlined"  sx={{color:"black" ,borderRadius:'25px' ,fontWeight:'bold'}}>Check</Button>
+                            <Button onClick={props.open} variant="outlined"  sx={{color:"black",borderColor:"black" ,borderRadius:'25px' ,fontWeight:'bold'}}>Check</Button>
                         </Box>
 
                     </Grid>
