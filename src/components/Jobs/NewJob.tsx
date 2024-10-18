@@ -43,16 +43,6 @@ const skillStyling ={
     }
 };
 
-/*interface JobDetails {
-    jobTitle: string;
-    type: string; // For example, it could be "Full time", "Part time", etc.
-    placeType: string; // For example, it could be "hi-tech", "startup", etc.
-    jobPlace: string; // Name of the company or job location
-    contactNumber: string; // Contact number as a string
-    skills: string[]; // Array of skills required for the job
-    link: string; // URL or link related to the job posting
-    description: string; // Job description
-}*/
 
 const initState : JobObject  = {
     //id:"",
@@ -137,8 +127,6 @@ export default function NewJob(props: any){
         props.closeNewJobDialog();
     }
 
-
-    console.log(jobDetails);
 
     return (
         <Dialog open={props.newJobDialog} fullWidth>

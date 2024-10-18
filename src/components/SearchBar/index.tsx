@@ -1,6 +1,6 @@
 import React , {useEffect, useState} from 'react';
 import {Box , Select ,MenuItem , Button} from '@mui/material';
-import { filters } from '../../App';
+import { filters } from '../Home/Home';
 import { useSignals } from '@preact/signals-react/runtime';
 
 
@@ -9,23 +9,8 @@ import { useSignals } from '@preact/signals-react/runtime';
 export default function SearchBar(props: any) {
   useSignals();
   const [loading,setLoading] = useState(false);
-  //const [jobSearch,setJobSearch] = useState(filters.value);
-  //const [filterType,setFilterType] = useState(filters.value.type);
-  //const [filterPlace,setFilterPlace] = useState(filters.value.placeType);
-
-  /* useEffect(()=>{
-    if(filters.value){
-      setFilterType(filters.value.type);
-      setFilterPlace(filters.value.placeType);
-    }
-  },[filters.value]) */
-
   const handleChange = (e: any) => {
-    //e.persist();
-    //setJobSearch(oldState => ({...oldState,[e.target.name]:e.target.value}));
     filters.value = {...filters.value,[e.target.name]:e.target.value};
-    console.log("After change:",filters.value);
-    //console.log(jobSearch);
   }
 
   const search = async () =>{
@@ -34,7 +19,7 @@ export default function SearchBar(props: any) {
     setLoading(false);
   }
 
-  console.log("hoda3a kablo:",filters.value);
+
 
   return (
     <Box p={2} mt={-5}

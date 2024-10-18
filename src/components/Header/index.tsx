@@ -7,7 +7,7 @@ import {Box , Grid ,Typography , Button } from '@mui/material';
 </Box>*/
 
 function Header(props: any){
-   return <Box py={10} bgcolor="#0A66C2" color="white">
+   return <Box py={4} bgcolor="#0A66C2" color="white">
             <Grid container justifyContent="center">
                 <Grid item xs={10} sx={{ px: 2 }}>
                     <Box display="flex" justifyContent="space-between" >

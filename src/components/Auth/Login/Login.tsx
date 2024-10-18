@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
+//import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import Sheet from '@mui/joy/Sheet';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Typography from '@mui/joy/Typography';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import Input from '@mui/joy/Input';
-import Button from '@mui/joy/Button';
+import Button from '@mui/material/Button';
 import Link from '@mui/joy/Link';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
+//import Select from '@mui/joy/Select';
+//import Option from '@mui/joy/Option';
 import {Box , Grid } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -17,19 +17,19 @@ import {auth} from '../../../firebase/config';
 import {useState} from 'react';
 import axios from 'axios';
 
-function Header(props){
-  return <Box py={5} bgcolor="#0A66C2" color="white">
+function Header(){
+  return <Box py={0.5} bgcolor="#0A66C2" color="white">
            <Grid container justifyContent="center">
                <Grid item xs={10} sx={{ px: 2 }}>
                    <Box display="flex" justifyContent="center" >
-                     <Typography variant ="h4" sx={{ fontSize: '3rem' , textAlign:'center' ,color:"white" }}>JobFinder</Typography>
+                     <Typography component="h4" sx={{ fontSize: '3rem' , textAlign:'center' ,color:"white" }}>JobFinder</Typography>
                        </Box> 
                </Grid>
            </Grid>
        </Box>
 }
 
-function validateEmail(email){
+function validateEmail(email: string){
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
@@ -38,16 +38,20 @@ function validateEmail(email){
 
 const initState = {
   email: "",
-  Password: ""
+  password: ""
+}
+
+const errorFieldsInitState ={
+  email: false
 }
 
 export default function Login() {
   const [loginCreds , setLoginCreds] = useState(initState); 
-  const [errorFields, setErrorFields] = useState({});
+  const [errorFields, setErrorFields] = useState(errorFieldsInitState);
   const [loading,setLoading]=useState(false);
 
 
-  const loginUser = async (userCredentials) => {
+  const loginUser = async () => {
     console.log("Entered loginUser");
     setLoading(true);
     try {
@@ -68,7 +72,7 @@ export default function Login() {
   }
   
   
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
     console.log("Entered handleChange");
     setLoginCreds((oldState) => ({...oldState,[e.target.name]:e.target.value}));
   }
@@ -79,7 +83,7 @@ export default function Login() {
     console.log("Entered handleSubmit");
     const { email, password} = loginCreds;
     
-    const errors = {};
+    const errors = {email: false};
     if (!validateEmail(email)) {errors.email = true; console.log("Email no good");}
   
     if (Object.keys(errors).length > 0) {
@@ -87,15 +91,15 @@ export default function Login() {
         return;
     }
   
-        setErrorFields({});
+        setErrorFields(errorFieldsInitState);
         setLoading(true);
-        await loginUser(loginCreds);
+        await loginUser();
         setLoading(false);
   }
 
 
   return (
-  <CssVarsProvider>
+  <div className='login'>
     <main>
       <Header />
       <CssBaseline />
@@ -190,6 +194,6 @@ export default function Login() {
 
       </Sheet>
     </main>
-  </CssVarsProvider>
+  </div>
   );
 }

@@ -1,28 +1,29 @@
 import * as React from 'react';
 import {useState} from 'react';
-import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
+//import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import Sheet from '@mui/joy/Sheet';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Typography from '@mui/joy/Typography';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import Input from '@mui/joy/Input';
-import Button from '@mui/joy/Button';
+import Button from '@mui/material/Button';
 import Link from '@mui/joy/Link';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
+//import Select from '@mui/joy/Select';
+//import Option from '@mui/joy/Option';
 import {Box , Grid } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import { Password } from '@mui/icons-material';
+//import { Password } from '@mui/icons-material';
 import axios from "axios";
+import { RegisterCredentials } from '../../../model/credentials.model';
 
 
-function Header(props){
-  return <Box py={5} bgcolor="#0A66C2" color="white">
+function Header(){
+  return <Box py={0.5} bgcolor="#0A66C2" color="white">
            <Grid container justifyContent="center">
                <Grid item xs={10} sx={{ px: 2 }}>
                    <Box display="flex" justifyContent="center" >
-                     <Typography variant ="h4" 
+                     <Typography component ="h4" 
                                  sx={{ fontSize: '3rem' , 
                                        textAlign:'center' ,
                                        color:"white" }}>
@@ -34,40 +35,38 @@ function Header(props){
 }
 
 
-function validateEmail(email){
+function validateEmail(email: string){
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
 
-function validatePassword(password){
+function validatePassword(password: string){
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_])[A-Za-z\d!@#$%^&*()_]{8,}$/;
   return passwordRegex.test(password);
 }
 
 
-function validateCredentials(credentials){
-  return (validateEmail(credentials.email) && 
-          validatePassword(credentials.password) && 
-          credentials.password === credentials.confirmPassword);
-}
-
-
-
 const initState = {
   email: "",
-  Password: "",
+  password: "",
   confirmPassword: ""
+}
+
+const errorFieldsInitState = {
+  email: false,
+  password: false,
+  confirmPassword: false
 }
 
 
 export default function Register() {
   const [registerCreds , setRegisterCreds] = useState(initState); 
-  const [errorFields, setErrorFields] = useState({});
+  const [errorFields, setErrorFields] = useState(errorFieldsInitState);
   const [loading,setLoading]=useState(false);
 
   
-  const registeUser = async (userCredentials) => {
+  const registeUser = async (userCredentials : RegisterCredentials) => {
     console.log("Entered registerUser");
     setLoading(true);
     try{
@@ -82,7 +81,7 @@ export default function Register() {
 
 
 
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
     console.log("Entered handleChange");
     setRegisterCreds((oldState) => ({...oldState,[e.target.name]:e.target.value}));
   }
@@ -93,7 +92,7 @@ export default function Register() {
     console.log("Entered handleSubmit");
     const { email, password , confirmPassword} = registerCreds;
     
-    const errors = {};
+    const errors = {email:false , password:false , confirmPassword:false};
     if (!validateEmail(email)) {errors.email = true; console.log("Email no good");}
     if (!validatePassword(password)) {errors.password = true; console.log("Passwod no good");}
     if (registerCreds.password !== registerCreds.confirmPassword) {errors.confirmPassword = true; console.log("passwords dont match");}
@@ -103,7 +102,7 @@ export default function Register() {
         return;
     }
 
-        setErrorFields({});
+        setErrorFields(errorFieldsInitState);
         setLoading(true);
         await registeUser(registerCreds);
         setLoading(false);
@@ -112,7 +111,7 @@ export default function Register() {
 
   
   return (
-  <CssVarsProvider>
+  <div className="register">
     <main>
       <Header />
       <CssBaseline />
@@ -146,7 +145,7 @@ export default function Register() {
             value={registerCreds.email}
             name="email"
             type="email"
-            sx={{border: errorFields.email ? '1px solid red' : 'none'}}
+            sx={{border: errorFields.email ? '1px solid red' : 'grey.800'}}
           />
           {errorFields.email && (
             <Typography sx={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -163,7 +162,7 @@ export default function Register() {
             value={registerCreds.password}
             name="password"
             type="password"
-            sx={{border: errorFields.password ? '1px solid red' : 'none'}}
+            sx={{border: errorFields.password ? '1px solid red' : 'grey.800'}}
           />
           {errorFields.password && (
             <Typography sx={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -181,7 +180,7 @@ export default function Register() {
             value={registerCreds.confirmPassword}
             name="confirmPassword"
             type="password"
-            sx={{border: errorFields.confirmPassword ? '1px solid red' : 'none'}}
+            sx={{border: errorFields.confirmPassword ? '1px solid red' : 'grey.800'}}
           />
           {errorFields.confirmPassword && (
             <Typography sx={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -227,6 +226,6 @@ export default function Register() {
 
       </Sheet>
     </main>
-  </CssVarsProvider>
+  </div>
   );
 }

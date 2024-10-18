@@ -31,7 +31,6 @@ export default function ViewJob(props: any){
                 <Box display="flex" ml={3} mb={2}>
                     <Typography variant="caption" fontSize={13}>Posted on:{" "}</Typography>
                     <Typography variant="body2" display="inline" ml={1} mt={0.1}>
-                        {console.log(typeof props.job.posted)}
                       {props.job.posted && format(convertTimestampToDate(props.job.posted),"dd/MM/yyyy HH:MM")}
                     </Typography>
                 </Box>

@@ -14,9 +14,6 @@ const skillsChip ={
 };
 
 function convertTimestampToDate(posted: any) {
-    if(!posted){
-        console.log("One of them undefined");
-    }
     const milliseconds = posted._seconds * 1000 + Math.floor(posted._nanoseconds / 1000000);
     return new Date(milliseconds);
 }
