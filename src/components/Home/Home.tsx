@@ -92,11 +92,11 @@ export default function Home(){
  
    
   return <div className="Home">
-   <Header openNewJobDialog={()=>setNewJobDialog(true)} />
+   <Header />
     <Box mb={5}>
    <Grid container justifyContent="center" mt={-5} mb={2}>
       <Grid component="div" xs={10}>
-        <SearchBar fetchJobsCustom={fetchJobsCustom} />
+        <SearchBar fetchJobsCustom={fetchJobsCustom} openNewJobDialog={()=>setNewJobDialog(true)}/>
 
         <NewJob newJobDialog={newJobDialog} 
                 closeNewJobDialog={()=>setNewJobDialog(false)} 

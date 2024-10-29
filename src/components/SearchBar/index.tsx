@@ -13,11 +13,11 @@ export default function SearchBar(props: any) {
     filters.value = {...filters.value,[e.target.name]:e.target.value};
   }
 
-  const search = async () =>{
+  /*const search = async () =>{
     setLoading(true);
     await props.fetchJobsCustom(filters.value);
     setLoading(false);
-  }
+  }*/
 
 
 
@@ -63,8 +63,8 @@ export default function SearchBar(props: any) {
             <MenuItem value="hi-tech">hi-tech</MenuItem>
             <MenuItem value="Other">Other</MenuItem>
         </Select>
-        <Button onClick={search} disabled={loading} variant="contained" color="primary" disableElevation sx={{ color:"white" ,fontWeight:'bold',height: 40, width: 110 ,backgroundColor:"#0A66C2"}}>
-            Search
+        <Button onClick={props.openNewJobDialog} disabled={loading} variant="contained" color="primary" disableElevation sx={{ color:"white" ,fontWeight:'bold',height: 40, width: 110 ,backgroundColor:"#0A66C2"}}>
+            Post a job
         </Button>
     </Box>
   );

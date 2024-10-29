@@ -12,7 +12,7 @@ function Header(props: any){
                 <Grid item xs={10} sx={{ px: 2 }}>
                     <Box display="flex" justifyContent="space-between" >
                       <Typography variant ="h4">JobFinder</Typography>
-                        <Button
+                       {/* <Button
                             onClick={props.openNewJobDialog}
                             variant="contained"
                             disableElevation
@@ -25,7 +25,7 @@ function Header(props: any){
                                 backgroundColor: '#f0f0f0', // A slightly darker shade on hover for a subtle effect
                                 },
                             }}
-                         >Post a job</Button>
+                         >Post a job</Button>*/}
                         </Box> 
                 </Grid>
             </Grid>
