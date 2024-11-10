@@ -1,5 +1,5 @@
 import React ,{useState,useEffect} from "react";
-import {Typography,ThemeProvider, CircularProgress,Box, Grid2,Grid} from "@mui/material";
+import {Typography,ThemeProvider, CircularProgress,Box, Grid2,Grid, Alert, Snackbar} from "@mui/material";
 import axios from "axios";
 import {JobObject} from "../../model/job.model";
 import ViewJob from "../Jobs/ViewJob";
@@ -32,6 +32,9 @@ export default function Home(){
   const [viewJob,setViewJob] = useState({});
   const serverURL = "http://localhost:8000/api";
   const {data: jobs ,loading: jobsLoading , error} = useAxiosGet<JobObject []>(`${serverURL}/jobs`,toggleFetch);
+  const isPermitted : boolean = (error? false : true) && !loading && (jobs? true : false) 
+  console.log("Error ***",error);
+ 
   
   useEffect(()=>{
     if(jobsLoading===false)
@@ -131,5 +134,15 @@ export default function Home(){
       </Grid>
    </Grid>
    </Box>
+  
+     <Snackbar open={!isPermitted} autoHideDuration={6000} anchorOrigin={{ vertical:"bottom",horizontal: "center" }}>
+  <Alert
+    severity="error"
+    variant="filled"
+    sx={{ width: '100%' }}
+  >
+    Action not allowed.
+  </Alert>
+</Snackbar>
   </div>
 };

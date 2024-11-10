@@ -51,6 +51,18 @@ export default function Login() {
   const [loading,setLoading]=useState(false);
 
 
+  async function googleAuth() {
+    console.log("Before fetch");
+    const response = await fetch("http://localhost:8000/api/request", { method: "post" , credentials: 'include' }
+    );
+    console.log("After fetch");
+
+    const data = await response.json();
+    console.log(data);
+    window.location.href = data.url; //navigates to url.
+  }
+
+
   const loginUser = async () => {
     console.log("Entered loginUser");
     setLoading(true);
@@ -187,7 +199,7 @@ export default function Login() {
             variant="outlined" 
             startIcon={<GoogleIcon />} // Add Google icon
             sx={{ justifyContent: 'center', width: '100%' }} // Center icon and text
-            onClick={() => { /* Handle Google sign-in here */ }}
+            onClick={() => googleAuth()}
           >
             Continue with Google
           </Button>
