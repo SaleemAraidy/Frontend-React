@@ -33,7 +33,7 @@ export interface Filters {
 
 export const filters = signal<Filters | null>(null);
 
-export default function Home() {
+export default function SavedJobs() {
   useSignals();
   const [filteredJobs, setfilteredJobs] = useState<JobObject[]>([]);
   const [toggleFetch, setToggleFtech] = useState<boolean>(false);
@@ -108,7 +108,7 @@ export default function Home() {
         setfilteredJobs(newFiltered);
       }
     } else {
-      if (jobs) setfilteredJobs(jobs);
+      if (jobs) setfilteredJobs(jobs.filter((job) => job.isChecked === true));
     }
   }, [filters.value, jobs]);
 

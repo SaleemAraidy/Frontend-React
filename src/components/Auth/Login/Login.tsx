@@ -51,15 +51,20 @@ export default function Login() {
   const [loading,setLoading]=useState(false);
 
 
-  async function googleAuth() {
-    console.log("Before fetch");
-    const response = await fetch("http://localhost:8000/api/request", { method: "post" , credentials: 'include' }
+  /* async function googleAuth() {
+    console.log("Before fetch : called googleAuth()");
+    const response = await fetch("http://localhost:8000/api/auth/google", { method: "get" , credentials: 'include' }
     );
     console.log("After fetch");
-
+    console.log("Response: ",response);
     const data = await response.json();
-    console.log(data);
+    console.log("Response data:",data);
     window.location.href = data.url; //navigates to url.
+  } */
+
+  async function googleAuth() {
+    console.log("Before fetch : called googleAuth()");
+    window.location.href = "http://localhost:8000/api/auth/google"; //navigates to url.
   }
 
 
