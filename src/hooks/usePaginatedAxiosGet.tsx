@@ -10,47 +10,44 @@ interface ReturnedData<T> {
 
 export function usePaginatedAxiosGet<T>(
   url: string,
-  refresh: boolean,
-  limit: number = 10 // Default limit per page
-): ReturnedData<T[]> {
-  const [data, setData] = useState<T[] | null>(null);
+  page: number, // Added page parameter to handle pagination
+  refresh: boolean // Added refresh parameter to force data re-fetch
+): ReturnedData<T> {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPaginatedData = async () => {
+    const controller = new AbortController(); // Allows us to cancel the request if needed
+
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
-      const allData: T[] = [];
-      let page = 1;
-
       try {
-        while (true) {
-          const response = await axios.get<T[]>(
-            `${url}?page=${page}&limit=${limit}`
-          );
-          if (response.data.length === 0) break; // Exit loop if no more data
-          allData.push(...response.data); // Append data from this page
-          page++;
+        const result = await axios.get<T>(url, {
+          params: { page }, // Send page number to the backend
+          signal: controller.signal, // Handle request cancellation
+        });
+        if (!controller.signal.aborted) {
+          setError(null);
+          setData(result.data); // Update state with fetched data
         }
-        setData(allData);
       } catch (err: any) {
         setData(null);
-        if (axios.isAxiosError(err) && err.response?.data?.title) {
-          setError(`${err.response.data.type}: ${err.response.data.title}`);
-        } else {
-          setError(
-            err?.message ?? "usePaginatedAxiosGet - Error fetching data"
-          );
-          console.error("Error fetching paginated data:", err);
+        if (axios.isAxiosError(err)) {
+          setError(err.message || "Error fetching data");
         }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
-    fetchPaginatedData().catch((err) => console.error(err));
-  }, [url, refresh, limit]);
+    fetchData();
+
+    return () => {
+      controller.abort("Operation canceled by the user."); // Cleanup to prevent memory leaks
+    };
+  }, [url, page, refresh]); // Added page and refresh as dependencies to trigger re-fetch
 
   return { data, loading, error };
 }

@@ -13,6 +13,7 @@ import { signal } from "@preact/signals-react";
 import { UserData } from "./model/user.model";
 import LoggedinNavbar from "./components/LoggedinNavbar.tsx/LoggedinNavbar";
 import SavedJobs from "./components/Jobs/SavedJobs";
+import { JobsProvider } from "./components/Jobs/JobsContext";
 
 export const signedInUser = signal<UserData | null>(null);
 
@@ -55,18 +56,20 @@ export default function App() {
   initAxios();
   return (
     <div className="app">
-      <BrowserRouter>
-        {/*<Navbar />*/}
-        <LoggedinNavbar /> {/* Add this line */}
-        <main>
-          <Routes>
-            <Route path="/saved-jobs" element={<SavedJobs />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </main>
-      </BrowserRouter>
+      <JobsProvider>
+        <BrowserRouter>
+          {/*<Navbar />*/}
+          <LoggedinNavbar /> {/* Add this line */}
+          <main>
+            <Routes>
+              <Route path="/saved-jobs" element={<SavedJobs />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          </main>
+        </BrowserRouter>
+      </JobsProvider>
     </div>
   );
 }

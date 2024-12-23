@@ -8,6 +8,7 @@ import {
   Grid,
   Alert,
   Snackbar,
+  Button,
 } from "@mui/material";
 import axios from "axios";
 import { JobObject } from "../../model/job.model";
@@ -25,6 +26,7 @@ import { signal } from "@preact/signals-react";
 import { useSignals } from "@preact/signals-react/runtime";
 import Navbar from "../Navbar/Navbar";
 import { signedInUser } from "../../App";
+import { usePaginatedAxiosGet } from "../../hooks/usePaginatedAxiosGet";
 
 export interface Filters {
   type?: string | undefined;
@@ -35,17 +37,25 @@ export const filters = signal<Filters | null>(null);
 
 export default function Home() {
   useSignals();
-  const [filteredJobs, setfilteredJobs] = useState<JobObject[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<JobObject[]>([]);
   const [toggleFetch, setToggleFtech] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [newJobDialog, setNewJobDialog] = useState(false);
   const [viewJob, setViewJob] = useState({});
+  const [page, setPage] = useState(1); // For pagination
+  const [allJobs, setAllJobs] = useState<JobObject[]>([]);
+  const [allJobsLoaded, setAllJobsLoaded] = useState(false); // Tracks if all jobs are loaded
   const serverURL = "http://localhost:8000/api";
+
   const {
     data: jobs,
     loading: jobsLoading,
     error,
-  } = useAxiosGet<JobObject[]>(`${serverURL}/jobs/for-user`, toggleFetch);
+  } = usePaginatedAxiosGet<JobObject[]>(
+    `${serverURL}/jobs/for-user`,
+    page,
+    toggleFetch
+  );
   const isGeneralError: boolean = !loading && (error ? true : false);
   console.log("Error ***", error);
   console.log("SignedInUser: ", signedInUser.value);
@@ -54,63 +64,60 @@ export default function Home() {
     if (jobsLoading === false) setLoading(false);
   }, [jobsLoading]);
 
-  const fetchJobsCustom = async (jobSearch: any) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${serverURL}/jobs/filter`, {
-        params: jobSearch,
-      });
-      //setJobs(response.data);
-    } catch (error) {
-      console.error("Error fetching jobs in custom search: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const registeUser = async (userCredentials: RegisterCredentials) => {
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        `${serverURL}/register`,
-        userCredentials
-      );
-    } catch (error) {
-      console.error("Error fetching jobs in custom search: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    let newFiltered: null | undefined | JobObject[] = jobs;
+    if (jobs) {
+      console.log("Jobs fetched: ", jobs);
+      if (jobs.length > 0) {
+        setAllJobs((prev) => [...prev, ...jobs]);
+        setFilteredJobs((prev) => {
+          const updatedAllJobs = [...prev, ...jobs]; // Combine previous jobs and newly fetched jobs
+          return applyFilters(updatedAllJobs); // Apply filters to the combined list
+        });
+      } else {
+        console.log("No jobs, Setting allJobsLoaded to true");
+        setAllJobsLoaded(true);
+      }
+    }
+  }, [jobs]);
+
+  const applyFilters = (allJobs: JobObject[]): JobObject[] => {
+    let filtered = allJobs;
 
     if (filters.value) {
       if (
         filters.value.type &&
         filters.value.type !== "All" &&
-        filters.value.type !== "Placehodler"
+        filters.value.type !== "Placeholder"
       ) {
-        newFiltered = newFiltered?.filter((item) => {
+        filtered = filtered.filter((item) => {
+          console.log("Job id: ", item.id, "type: ", item.type);
           return item.type === filters.value?.type;
         });
       }
       if (
         filters.value.placeType &&
         filters.value.placeType !== "All" &&
-        filters.value.placeType !== "Placehodler"
+        filters.value.placeType !== "Placeholder"
       ) {
-        newFiltered = newFiltered?.filter((item) => {
+        filtered = filtered.filter((item) => {
+          console.log("Job id: ", item.id, "placetype: ", item.placeType);
           return item.placeType === filters.value?.placeType;
         });
       }
-      if (newFiltered) {
-        setfilteredJobs(newFiltered);
-      }
-    } else {
-      if (jobs) setfilteredJobs(jobs);
     }
-  }, [filters.value, jobs]);
+
+    return filtered;
+  };
+
+  useEffect(() => {
+    // Re-apply filters whenever filters or allJobs change
+    setFilteredJobs(allJobs);
+    setFilteredJobs((prevJobs) => applyFilters(prevJobs));
+  }, [filters.value]);
+
+  const loadMoreJobs = () => {
+    setPage((prev) => prev + 1); // Increment the page to fetch the next set of jobs
+  };
 
   return (
     <div className="Home">
@@ -118,10 +125,7 @@ export default function Home() {
       <Box mb={5}>
         <Grid container justifyContent="center" mt={-5} mb={2}>
           <Grid component="div" xs={10}>
-            <SearchBar
-              fetchJobsCustom={fetchJobsCustom}
-              openNewJobDialog={() => setNewJobDialog(true)}
-            />
+            <SearchBar openNewJobDialog={() => setNewJobDialog(true)} />
 
             <NewJob
               newJobDialog={newJobDialog}
@@ -166,6 +170,18 @@ export default function Home() {
                   />
                 );
               })
+            )}
+
+            {!allJobsLoaded && !loading && !error && (
+              <Box display="flex" justifyContent="center" mt={3}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={loadMoreJobs}
+                >
+                  Load More
+                </Button>
+              </Box>
             )}
           </Grid>
         </Grid>
