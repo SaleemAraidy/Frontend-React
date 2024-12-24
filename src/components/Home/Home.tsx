@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Typography,
   ThemeProvider,
@@ -27,6 +27,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import Navbar from "../Navbar/Navbar";
 import { signedInUser } from "../../App";
 import { usePaginatedAxiosGet } from "../../hooks/usePaginatedAxiosGet";
+import { JobsContext, useJobsContext } from "../Jobs/JobsContext";
 
 export interface Filters {
   type?: string | undefined;
@@ -42,10 +43,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [newJobDialog, setNewJobDialog] = useState(false);
   const [viewJob, setViewJob] = useState({});
-  const [page, setPage] = useState(1); // For pagination
-  const [allJobs, setAllJobs] = useState<JobObject[]>([]);
-  const [allJobsLoaded, setAllJobsLoaded] = useState(false); // Tracks if all jobs are loaded
+  const [page, setPage] = useState(1);
+  const { allJobs, setAllJobs } = useContext(JobsContext);
+  const [allJobsLoaded, setAllJobsLoaded] = useState(false);
   const serverURL = "http://localhost:8000/api";
+  console.log("All Jobs in Home file: ", allJobs);
 
   const {
     data: jobs,
@@ -111,8 +113,7 @@ export default function Home() {
 
   useEffect(() => {
     // Re-apply filters whenever filters or allJobs change
-    setFilteredJobs(allJobs);
-    setFilteredJobs((prevJobs) => applyFilters(prevJobs));
+    setFilteredJobs(applyFilters(allJobs));
   }, [filters.value]);
 
   const loadMoreJobs = () => {

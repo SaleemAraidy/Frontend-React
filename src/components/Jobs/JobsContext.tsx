@@ -6,12 +6,24 @@ interface JobsContextType {
   setAllJobs: React.Dispatch<React.SetStateAction<JobObject[]>>;
 }
 
-const JobsContext = createContext<JobsContextType | undefined>(undefined);
+export const JobsContext = createContext<JobsContextType>({
+  allJobs: [],
+  setAllJobs: () => {},
+});
+
+export function useJobsContext() {
+  const context = useContext(JobsContext);
+  if (!context) {
+    throw new Error("useJobsContext must be used within a JobsProvider");
+  }
+  return context;
+}
 
 export const JobsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [allJobs, setAllJobs] = useState<JobObject[]>([]);
+  console.log("All Jobs in JobsContext file: ", allJobs);
 
   return (
     <JobsContext.Provider value={{ allJobs, setAllJobs }}>

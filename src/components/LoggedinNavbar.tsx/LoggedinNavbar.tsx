@@ -16,20 +16,14 @@ import { signedInUser } from "../../App";
 import "./LoggedinNavbar.css";
 import { useSignals } from "@preact/signals-react/runtime";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function MenuAppBar() {
+  const navigate = useNavigate();
   useSignals();
   const [auth, setAuth] = React.useState(true); // Assume user is authenticated
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [user, setUser] = React.useState<UserData | null>(null);
-
-  // Mock user data (replace with real data)
-  /*  const user = {
-    fullName: 'John Doe',
-    email: 'johndoe@example.com',
-    profilePicture: null, // Replace with URL if available
-  };
- */
 
   React.useEffect(() => {
     if (signedInUser.value) {
@@ -52,7 +46,8 @@ export default function MenuAppBar() {
   }
 
   function handleSavedJobsClick(): void {
-    window.location.href = "/saved-jobs";
+    //window.location.href = "/saved-jobs";
+    navigate("saved-jobs");
   }
 
   function handleLogout(): void {
@@ -60,11 +55,6 @@ export default function MenuAppBar() {
     signedInUser.value = null;
     setUser(null);
   }
-
-  /* if(user === null) {
-   // window.location.href = '/login'; 
-
-  }; */
 
   return (
     <Box sx={{ flexGrow: 1 }}>

@@ -23,10 +23,7 @@ const initAxios = () => {
     function (response) {
       const token = Cookies.get("access_token") as string;
       if (token) {
-        console.log("--------Token:--------", token);
         const decodedToken: any = jwtDecode(token);
-        console.log("--------Decoded Token:--------", decodedToken);
-
         signedInUser.value = {
           email: decodedToken.email,
           givenName: decodedToken.given_name,
@@ -44,9 +41,7 @@ const initAxios = () => {
     function (error) {
       if (error.response && error.response.status === 401) {
         window.location.href = "/login";
-      } /* else if(error.response && (error.response.status === 403)) {
-
-      }*/
+      }
       return Promise.reject(error);
     }
   );
@@ -58,8 +53,7 @@ export default function App() {
     <div className="app">
       <JobsProvider>
         <BrowserRouter>
-          {/*<Navbar />*/}
-          <LoggedinNavbar /> {/* Add this line */}
+          <LoggedinNavbar />
           <main>
             <Routes>
               <Route path="/saved-jobs" element={<SavedJobs />} />
