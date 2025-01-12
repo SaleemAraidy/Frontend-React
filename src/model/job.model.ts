@@ -17,4 +17,6 @@ export interface JobObject {
   jobPlace: string;
   posted: typeof serverTimestamp;
   description: string;
+  posterId?: string;
+  posterEmail?: string;
 }

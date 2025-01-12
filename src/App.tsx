@@ -4,16 +4,17 @@ import "./index.css";
 import Home from "./components/Home/Home";
 import Login from "./components/Auth/Login/Login";
 import Register from "./components/Auth/Register/Register";
-import Navbar from "./components/Navbar/Navbar";
+//import Navbar from "./components/Navbar/Navbar";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { signal } from "@preact/signals-react";
 import { UserData } from "./model/user.model";
-import LoggedinNavbar from "./components/LoggedinNavbar.tsx/LoggedinNavbar";
+import Navbar from "./components/Navbar/Navbar";
 import SavedJobs from "./components/Jobs/SavedJobs";
 import { JobsProvider } from "./components/Jobs/JobsContext";
+import JobsIPosted from "./components/Jobs/JobsIPosted";
 
 export const signedInUser = signal<UserData | null>(null);
 
@@ -25,6 +26,7 @@ const initAxios = () => {
       if (token) {
         const decodedToken: any = jwtDecode(token);
         signedInUser.value = {
+          id: decodedToken.id,
           email: decodedToken.email,
           givenName: decodedToken.given_name,
           familyName: decodedToken.family_name,
@@ -53,9 +55,10 @@ export default function App() {
     <div className="app">
       <JobsProvider>
         <BrowserRouter>
-          <LoggedinNavbar />
+          <Navbar />
           <main>
             <Routes>
+              <Route path="/posted-jobs" element={<JobsIPosted />} />
               <Route path="/saved-jobs" element={<SavedJobs />} />
               <Route path="/" element={<Home />} />
               <Route path="/register" element={<Register />} />

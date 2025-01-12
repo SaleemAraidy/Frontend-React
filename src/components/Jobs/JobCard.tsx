@@ -3,8 +3,19 @@ import { Grid, Box, Typography, Button, IconButton } from "@mui/material";
 import { differenceInCalendarDays, differenceInMinutes, set } from "date-fns";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { JobObject } from "../../model/job.model";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { signedInUser } from "../../App";
+import { useSignal } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 const skillsChip = {
   margin: "4px",
@@ -31,8 +42,11 @@ interface JobCardProps {
 
 export default function JobCard(props: JobCardProps) {
   // Add checked useState parameter
+  useSignals();
+  const navigate = useNavigate();
   const { open, key, job } = props;
   const [checked, setChecked] = React.useState(job.isChecked);
+  const [dialogOpen, setDialogOpen] = React.useState(false); // Dialog state
   const serverURL = "http://localhost:8000/api";
 
   const toggleSaveJob = async () => {
@@ -42,9 +56,38 @@ export default function JobCard(props: JobCardProps) {
         jobId: job.id,
         isChecked: !checked,
       });
-      setChecked(!job.isChecked);
+      setChecked(!checked);
     } catch (e) {
       console.error("Error saving job in toggleSaveJob in JobCard", e);
+    }
+  };
+
+  const deleteJob = async (jobId: string) => {
+    try {
+      if (jobId === "none") {
+        console.error("No job id found, could not delete job");
+        alert("An error occurred while trying to delete the job");
+      }
+      const response = await axios.delete(
+        `http://localhost:8000/api/jobs/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        console.log(response.data.message);
+        alert("Job deleted successfully");
+        navigate(0);
+      } else {
+        console.error("Failed to delete job:", response.data.message);
+        alert(response.data.message);
+      }
+    } catch (e) {
+      console.error("Error deleting job:", e);
+      alert("An error occurred while trying to delete the job.");
+    } finally {
+      setDialogOpen(false); // Close dialog
     }
   };
 
@@ -107,7 +150,19 @@ export default function JobCard(props: JobCardProps) {
 
           <div style={{ display: "flex" }}>
             <Box mt={1}>
-              <IconButton aria-label="delete" onClick={() => toggleSaveJob()}>
+              <IconButton
+                aria-label="delete"
+                onClick={() => setDialogOpen(true)}
+              >
+                {String(signedInUser.value?.id) === String(job.posterId) ||
+                String(signedInUser.value?.id) === String(1) ? (
+                  <DeleteIcon color="action" />
+                ) : null}
+              </IconButton>
+            </Box>
+
+            <Box mt={1}>
+              <IconButton aria-label="saved" onClick={() => toggleSaveJob()}>
                 {checked ? (
                   <BookmarkIcon color="primary" />
                 ) : (
@@ -133,6 +188,23 @@ export default function JobCard(props: JobCardProps) {
           </div>
         </Grid>
       </Grid>
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>Delete Job</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this job? This action is permanent and
+          cannot be undone.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => deleteJob(job.id ? job.id : "none")}
+            color="error"
+          >
+            Yes, delete job
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

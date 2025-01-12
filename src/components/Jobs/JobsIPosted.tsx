@@ -22,7 +22,6 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { signedInUser } from "../../App";
 import { usePaginatedAxiosGet } from "../../hooks/usePaginatedAxiosGet";
 import { filters } from "../Home/Home";
-import { Navigate, useNavigate } from "react-router-dom";
 
 export interface Filters {
   type?: string | undefined;
@@ -31,7 +30,7 @@ export interface Filters {
 
 //export const filters = signal<Filters | null>(null);
 
-export default function SavedJobs() {
+export default function JobsIPosted() {
   useSignals();
   const [filteredJobs, setFilteredJobs] = useState<JobObject[]>([]);
   const [toggleFetch, setToggleFtech] = useState<boolean>(false);
@@ -113,11 +112,13 @@ export default function SavedJobs() {
     }
 
     filtered = filtered.filter((item) => {
-      return item.isChecked === true;
+      return String(item.posterId) === String(signedInUser.value?.id);
     });
+
     if (filtered.length < 200) {
       setAllJobsLoaded(true);
     }
+
     return filtered;
   };
 
@@ -130,7 +131,7 @@ export default function SavedJobs() {
   };
 
   return (
-    <div className="SavedJobs">
+    <div className="JobsIPosted">
       <Header />
       <Box mb={5}>
         <Grid container justifyContent="center" mt={-5} mb={2}>

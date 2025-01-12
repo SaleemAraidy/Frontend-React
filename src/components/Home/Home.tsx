@@ -44,7 +44,7 @@ export default function Home() {
   const [newJobDialog, setNewJobDialog] = useState(false);
   const [viewJob, setViewJob] = useState({});
   const [page, setPage] = useState(1);
-  const { allJobs, setAllJobs } = useContext(JobsContext);
+  const [allJobs, setAllJobs] = useState<JobObject[]>([]);
   const [allJobsLoaded, setAllJobsLoaded] = useState(false);
   const serverURL = "http://localhost:8000/api";
   console.log("All Jobs in Home file: ", allJobs);
@@ -70,10 +70,20 @@ export default function Home() {
     if (jobs) {
       console.log("Jobs fetched: ", jobs);
       if (jobs.length > 0) {
-        setAllJobs((prev) => [...prev, ...jobs]);
+        setAllJobs((prev) => {
+          const newJobs = jobs.filter(
+            (job) => !prev.some((existingJob) => existingJob.id === job.id)
+          );
+          return [...prev, ...newJobs];
+        });
         setFilteredJobs((prev) => {
-          const updatedAllJobs = [...prev, ...jobs]; // Combine previous jobs and newly fetched jobs
-          return applyFilters(updatedAllJobs); // Apply filters to the combined list
+          const updatedAllJobs = [
+            ...prev,
+            ...jobs.filter(
+              (job) => !prev.some((existingJob) => existingJob.id === job.id)
+            ),
+          ];
+          return applyFilters(updatedAllJobs);
         });
       } else {
         console.log("No jobs, Setting allJobsLoaded to true");
@@ -107,12 +117,16 @@ export default function Home() {
         });
       }
     }
-
+    if (filtered.length < 200) {
+      setAllJobsLoaded(true);
+    }
+    filtered.sort((a, b) => {
+      return (b.posted as any)._seconds - (a.posted as any)._seconds;
+    });
     return filtered;
   };
 
   useEffect(() => {
-    // Re-apply filters whenever filters or allJobs change
     setFilteredJobs(applyFilters(allJobs));
   }, [filters.value]);
 

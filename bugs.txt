@@ -1,0 +1,6 @@
+When a job is posted it doesnt show before refresh, even though updating 'toggleFetch' 
+state variable should trigger UseAxios get again and fetch new jobs.
+
+When a job is unchecked in SavedJobs its still checked(probably just the button filled and not checked in DB)
+when navigating back to Home page, until we click browser refresh, probalbly navigating back to Home page
+isnt re-rendering the componenet.
